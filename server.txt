@@ -1,0 +1,38 @@
+const express = require("express");
+const colors = require("colors");
+const moragan = require("morgan");
+const dotenv = require("dotenv");
+const connectDB = require("./config/db");
+const cors = require('cors');
+const authRoutes = require('./routes/authRoutes');
+import userRoutes from "./routes/userRoutes.js";
+import sliderRoutes from "./routes/sliderRoutes.js";
+import ytshortRoutes from "./routes/ytshortRoutes.js";
+//dotenv conig
+dotenv.config();
+
+//mongodb connection
+connectDB();
+
+//rest obejct
+const app = express();
+app.use(cors());
+
+//middlewares
+app.use(express.json());
+app.use(moragan("dev"));
+
+//routes
+app.use('/api/auth', authRoutes);
+app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/slider", sliderRoutes);
+app.use("/api/v1/other",ytshortRoutes)
+
+//port
+const port = process.env.PORT || 8080;
+const hostname = process.env.HOSTNAME || localhost;
+
+//listen port
+app.listen(port, '0.0.0.0', () => {
+    console.log(`Server is running at http://${hostname}:${port}`);
+});
