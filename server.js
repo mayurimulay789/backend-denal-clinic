@@ -36,13 +36,11 @@ app.use(cors({
 // Define routes
 import userRoutes from './routes/userRoutes.js'; // Ensure to add .js
 import sliderRoutes from './routes/sliderRoutes.js'; // Ensure to add .js
-import otherRoutes from './routes/ytshortRoutes.js'; // Ensure to add .js
 import appointmentRoutes from './routes/appointmentRoutes.js'; // Ensure to add .js
 
 // API Routes
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/sliders', sliderRoutes);
-app.use('/api/v1/others', otherRoutes);
 app.use('/api/v1/appointments', appointmentRoutes); // Ensure to include /api/v1/
 
 // Test route
