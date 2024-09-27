@@ -32,13 +32,11 @@ const userSchema = new mongoose.Schema({
   permissions: {
     type: [String],
     enum: [
-      "Slider",
-      "PostManagement",
-      "CustomPages",
-      "Footer",
+      "SliderImage",
+      
       "UserManagement",
-      "UserMessages",
-      "UserEnquiries",
+      "Blog",
+      "Appointment"
     ],
     default: [],
   },

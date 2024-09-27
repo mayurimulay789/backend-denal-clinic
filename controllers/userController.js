@@ -30,10 +30,10 @@ export const signup = catchAsyncError(async (req, res, next) => {
 
   // SENDING CREDENTIALS
   const to = email;
-  const subject = "CREDENTIALS - Ranjita's Blog";
+  const subject = "hello dental clinic hub";
   const text = `Hii ${name},
 
-                Welcoming you to Ranjita's Blog, use below credentials to login at Ranjita's Blog
+                Welcoming you to dental clinic hub, use below credentials to login at dental clinic hub
 
                 Email: ${email}
                 Password: ${password}

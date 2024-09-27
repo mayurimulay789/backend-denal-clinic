@@ -4,11 +4,11 @@ import cookieParser from 'cookie-parser';
 import { v2 as cloudinary } from 'cloudinary';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { ConnectDB } from './config/db.js'; 
+import { ConnectDB } from './config/db.js';
 import ErrorMiddleware from './middlewares/Error.js'; // Ensure to add .js
 
 // Load environment variables
-dotenv.config({ path: './config/config.env' }); // Update the path to your .env file
+dotenv.config({ path: './config/config.env' });
 
 // Initialize Express app
 const app = express();
@@ -37,11 +37,13 @@ app.use(cors({
 import userRoutes from './routes/userRoutes.js'; // Ensure to add .js
 import sliderRoutes from './routes/sliderRoutes.js'; // Ensure to add .js
 import otherRoutes from './routes/ytshortRoutes.js'; // Ensure to add .js
+import appointmentRoutes from './routes/appointmentRoutes.js'; // Ensure to add .js
 
 // API Routes
-app.use('/api/v1/user', userRoutes);
-app.use('/api/v1/slider', sliderRoutes);
-app.use('/api/v1/other', otherRoutes);
+app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/sliders', sliderRoutes);
+app.use('/api/v1/others', otherRoutes);
+app.use('/api/v1/appointments', appointmentRoutes); // Ensure to include /api/v1/
 
 // Test route
 app.get('/', (req, res) => {
