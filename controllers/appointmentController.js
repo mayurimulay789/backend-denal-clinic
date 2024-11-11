@@ -1,80 +1,115 @@
-// controllers/appointmentController.js
 import Appointment from '../models/Appointment.js';
+
+// Check availability
+export const checkAvailability = async (req, res) => {
+  try {
+    const { date, timeSlot } = req.query;
+
+    // Validate if both date and timeSlot are provided
+    if (!date || !timeSlot) {
+      return res.status(400).json({ message: 'Date and time slot are required.' });
+    }
+
+    // Parse the date to a valid Date object
+    const appointmentDate = new Date(date);
+    
+    // Validate if the date is valid
+    if (isNaN(appointmentDate)) {
+      return res.status(400).json({ message: 'Invalid date format.' });
+    }
+
+    // Search for appointments on the same day and time slot
+    const appointments = await Appointment.find({
+      date: {
+        $gte: new Date(appointmentDate.setHours(0, 0, 0, 0)), // Start of the day
+        $lt: new Date(appointmentDate.setHours(23, 59, 59, 999)), // End of the day
+      },
+      timeSlot,
+    });
+
+    if (appointments.length > 0) {
+      return res.status(200).json({ message: 'Time slot is booked.' });
+    }
+
+    return res.status(200).json({ message: 'Time slot is available.' });
+  } catch (error) {
+    console.error('Error checking availability:', error);
+    return res.status(500).json({ message: 'Server error. Please try again later.' });
+  }
+};
+
+// Book appointment
+export const bookAppointment = async (req, res) => {
+  try {
+    const { name, email, date, timeSlot, message } = req.body;
+
+    // Check if date and timeSlot are provided
+    if (!name || !email || !date || !timeSlot) {
+      return res.status(400).json({ message: 'All fields are required.' });
+    }
+
+    const appointmentDate = new Date(date);
+
+    // Validate if the date is valid
+    if (isNaN(appointmentDate)) {
+      return res.status(400).json({ message: 'Invalid date format.' });
+    }
+
+    // Check if the time slot is available before booking
+    const existingAppointments = await Appointment.find({
+      date: {
+        $gte: new Date(appointmentDate.setHours(0, 0, 0, 0)),
+        $lt: new Date(appointmentDate.setHours(23, 59, 59, 999)),
+      },
+      timeSlot,
+    });
+
+    if (existingAppointments.length > 0) {
+      return res.status(409).json({ message: 'Time slot is already booked.' });
+    }
+
+    // Create new appointment
+    const newAppointment = new Appointment({
+      name,
+      email,
+      date: appointmentDate,
+      timeSlot,
+      message,
+    });
+
+    await newAppointment.save();
+    return res.status(201).json({ message: 'Appointment booked successfully!' });
+  } catch (error) {
+    console.error('Error booking appointment:', error);
+    return res.status(500).json({ message: 'Server error. Please try again later.' });
+  }
+};
 
 // Get all appointments
 export const getAppointments = async (req, res) => {
   try {
-    const appointments = await Appointment.find();
-    res.json(appointments);
+    const appointments = await Appointment.find({});
+    return res.status(200).json(appointments);
   } catch (error) {
-    res.status(500).json({ msg: 'Error fetching appointments' });
+    console.error('Error fetching appointments:', error);
+    return res.status(500).json({ message: 'Server error. Please try again later.' });
   }
 };
 
-// Create a new appointment
-export const createAppointment = async (req, res) => {
-  try {
-    const appointment = new Appointment(req.body);
-    await appointment.save();
-
-    // Notify admin after saving the appointment
-    console.log(`Admin notified: New appointment for ${appointment.fullname} on ${appointment.date} at ${appointment.time}`);
-
-    res.status(201).json({ msg: 'Appointment added successfully!' });
-  } catch (error) {
-    res.status(400).json({ msg: 'Error adding appointment', error });
-  }
-};
-
-// Update an existing appointment
-export const updateAppointment = async (req, res) => {
-  try {
-    await Appointment.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json({ msg: 'Appointment updated successfully!' });
-  } catch (error) {
-    res.status(400).json({ msg: 'Error updating appointment', error });
-  }
-};
-
-// Delete an appointment
+// Delete appointment
 export const deleteAppointment = async (req, res) => {
   try {
-    await Appointment.findByIdAndDelete(req.params.id);
-    res.json({ msg: 'Appointment deleted successfully!' });
+    const { id } = req.params;
+
+    // Ensure the ID is provided
+    if (!id) {
+      return res.status(400).json({ message: 'Appointment ID is required.' });
+    }
+
+    await Appointment.findByIdAndDelete(id);
+    return res.status(204).send();
   } catch (error) {
-    res.status(400).json({ msg: 'Error deleting appointment', error });
+    console.error('Error deleting appointment:', error);
+    return res.status(500).json({ message: 'Server error. Please try again later.' });
   }
 };
-
-// Check availability of time slots for a specific date
-export const checkTimeSlotAvailability = async (req, res) => {
-  const { date } = req.query;
-
-  // Pre-defined time slots (can be fetched from DB or customized)
-  const slots = [
-    { time: '09:00', available: true },
-    { time: '10:00', available: true },
-    { time: '11:00', available: false },
-    { time: '12:00', available: true },
-    { time: '13:00', available: false },
-  ];
-
-  try {
-    // You can add logic to fetch actual slot availability from the database
-    res.json({ slots });
-  } catch (error) {
-    res.status(500).json({ msg: 'Error checking time slots' });
-  }
-};
-
-// Notify admin of a new appointment (mock logic)
-// controllers/appointmentController.js
-export const notifyAdmin = (req, res) => {
-  try {
-    console.log('Admin notified:', req.body.message);  // Log the message to the console
-    res.status(200).json({ msg: 'Admin notified!' });
-  } catch (error) {
-    res.status(500).json({ msg: 'Error notifying admin', error });
-  }
-};
-

@@ -1,26 +1,13 @@
-// models/appointmentModel.js
+// models/Appointment.js
 import mongoose from 'mongoose';
 
 const appointmentSchema = new mongoose.Schema({
-  fullname: {
-    type: String,
-    required: true,
-  },
-  cellphone: {
-    type: String,
-    required: true,
-  },
-  date: {
-    type: String,
-    required: true,
-  },
-  time: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-  },
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  date: { type: Date, required: true },
+  timeSlot: { type: String, required: true },
+  message: { type: String, default: '' },
 });
 
-export default mongoose.model('Appointment', appointmentSchema);
+const Appointment = mongoose.model('Appointment', appointmentSchema);
+export default Appointment;
